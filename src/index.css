@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: silk --default, garden --prefersdark;
+}
+
+/* 정갈한 글씨체 */
+@font-face {
+    font-family: 'Paperozi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+
+/* 날려쓴 필기체 */
+@font-face {
+    font-family: 'PerpetualSnow';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2508-2@1.0/PermanentSnow.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* 정갈한 귀여운 글씨체 */
+@font-face {
+    font-family: 'OngleipKonkon';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2412-1@1.0/Ownglyph_corncorn-Rg.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
+/* 그냥귀여운 글씨체 */
+@font-face {
+    font-family: 'OmuDaye';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
+/* 카페24러빙유체 - 간지나는 영어 필기체 */
+@font-face {
+    font-family: 'Cafe24LovingU';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2405-3@1.1/Cafe24Lovingu.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
+/* 강원교육새움체 - 따뜻한 손글씨 */
+@font-face {
+    font-family: 'GangwonEducationSaeum';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEduSaeeum_OTFMediumA.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  scrollbar-width: none;
+}
+
+body {
+    width: 100%;
+    font-family: 'Paperozi', sans-serif;
+    word-break: keep-all;
+}
+
+.menu-font {
+    font-family: 'OngleipKonkon';
+}
+
+.font-saeum {
+    font-family: 'GangwonEducationSaeum';
+}
+
+.font-paperozi {
+    font-family: 'Paperozi';
+}
+
+.font-ongle {
+    font-family: 'OngleipKonkon';
+}
+
+.font-snow {
+    font-family: 'PerpetualSnow';
+}
+
+.font-omu {
+    font-family: 'OmuDaye';
+}
+
+.font-loving {
+    font-family: 'Cafe24LovingU';
+}
