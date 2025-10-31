@@ -7,7 +7,7 @@ export default function Header() {
   }, []);
 
   const goMenu = (menu) => {
-    location.href = `/soldout-manage-front/${menu}`;
+    location.href = `/${menu}`;
   }
 
   return (
