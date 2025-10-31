@@ -2,7 +2,7 @@ const apiBaseUrl = 'https://shuttle-transmitted-establish-illustrated.trycloudfl
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Popup from "@/components/popup";
+import Popup from "@/components/Popup";
 
 let loadingCnt = 0;
 let popupRoot = null;
