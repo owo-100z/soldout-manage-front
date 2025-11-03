@@ -1,4 +1,4 @@
-const apiBaseUrl = 'https://shuttle-transmitted-establish-illustrated.trycloudflare.com/api';
+const apiBaseUrl = 'https://dip-intervention-automated-itunes.trycloudflare.com/api';
 
 import React from "react";
 import ReactDOM from "react-dom/client";
