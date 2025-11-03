@@ -3786,6 +3786,392 @@
                     "_type": "optionList"
                 }
             ]
+        },
+        "yogiyo": {
+            "뼈": [
+                {
+                    "invisible": false,
+                    "price": 0,
+                    "invisible_until": null,
+                    "option_id": 2976748565,
+                    "name": "뼈",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 0,
+                    "invisible_until": null,
+                    "option_id": 2976748571,
+                    "name": "뼈",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 0,
+                    "invisible_until": null,
+                    "option_id": 2976748624,
+                    "name": "뼈",
+                    "_type": "optionList"
+                }
+            ],
+            "순살": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104289,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "네네순살닭강정",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 2000,
+                    "invisible_until": null,
+                    "option_id": 2976748566,
+                    "name": "순살",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748572,
+                    "name": "순살",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 2000,
+                    "invisible_until": null,
+                    "option_id": 2976748625,
+                    "name": "순살",
+                    "_type": "optionList"
+                }
+            ],
+            "윙봉": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104326,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 26000,
+                    "invisible": false,
+                    "name": "소이크런치윙봉",
+                    "_type": "menuList"
+                },
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104347,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "윙봉",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748567,
+                    "name": "윙봉",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 4500,
+                    "invisible_until": null,
+                    "option_id": 2976748573,
+                    "name": "윙봉",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748626,
+                    "name": "윙봉",
+                    "_type": "optionList"
+                }
+            ],
+            "다리": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104295,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "닭다리",
+                    "_type": "menuList"
+                },
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104296,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "닭다리반＋닭날개반",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748564,
+                    "name": "닭다리",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 4500,
+                    "invisible_until": null,
+                    "option_id": 2976748570,
+                    "name": "닭다리",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748623,
+                    "name": "닭다리",
+                    "_type": "optionList"
+                }
+            ],
+            "윙봉반": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104326,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 26000,
+                    "invisible": false,
+                    "name": "소이크런치윙봉",
+                    "_type": "menuList"
+                },
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104347,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "윙봉",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748567,
+                    "name": "윙봉",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 4500,
+                    "invisible_until": null,
+                    "option_id": 2976748573,
+                    "name": "윙봉",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748626,
+                    "name": "윙봉",
+                    "_type": "optionList"
+                }
+            ],
+            "다리반": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104295,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "닭다리",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748564,
+                    "name": "닭다리",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 4500,
+                    "invisible_until": null,
+                    "option_id": 2976748570,
+                    "name": "닭다리",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 3000,
+                    "invisible_until": null,
+                    "option_id": 2976748623,
+                    "name": "닭다리",
+                    "_type": "optionList"
+                },
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104296,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "닭다리반＋닭날개반",
+                    "_type": "menuList"
+                }
+            ],
+            "감자": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104279,
+                    "oneday_invisible": false,
+                    "is_option_sections": false,
+                    "price": 4000,
+                    "invisible": false,
+                    "name": "네네감자튀김",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 4000,
+                    "invisible_until": null,
+                    "option_id": 2976748574,
+                    "name": "네네감자튀김",
+                    "_type": "optionList"
+                }
+            ],
+            "치킨무": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104362,
+                    "oneday_invisible": false,
+                    "is_option_sections": false,
+                    "price": 1000,
+                    "invisible": false,
+                    "name": "치킨무",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 1000,
+                    "invisible_until": null,
+                    "option_id": 2976748591,
+                    "name": "치킨무",
+                    "_type": "optionList"
+                }
+            ],
+            "코울슬로": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104367,
+                    "oneday_invisible": false,
+                    "is_option_sections": false,
+                    "price": 1000,
+                    "invisible": false,
+                    "name": "코울슬로",
+                    "_type": "menuList"
+                }
+            ],
+            "스노윙MAXX": [
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104332,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 25000,
+                    "invisible": false,
+                    "name": "스노윙MAXX",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 2500,
+                    "invisible_until": null,
+                    "option_id": 2976748528,
+                    "name": "스노윙MAXX반",
+                    "_type": "optionList"
+                },
+                {
+                    "invisible": false,
+                    "price": 2500,
+                    "invisible_until": null,
+                    "option_id": 2976748549,
+                    "name": "스노윙MAXX반",
+                    "_type": "optionList"
+                },
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104333,
+                    "oneday_invisible": false,
+                    "is_option_sections": true,
+                    "price": 28500,
+                    "invisible": false,
+                    "name": "스노윙MAXX+네네볼",
+                    "_type": "menuList"
+                },
+                {
+                    "display_of_invisible_item": false,
+                    "longterm_invisible": false,
+                    "invisible_until": null,
+                    "product_id": 1871104353,
+                    "oneday_invisible": false,
+                    "is_option_sections": false,
+                    "price": 1500,
+                    "invisible": false,
+                    "name": "찍어바요소스",
+                    "_type": "menuList"
+                },
+                {
+                    "invisible": false,
+                    "price": 1500,
+                    "invisible_until": null,
+                    "option_id": 2976748600,
+                    "name": "찍어바요소스",
+                    "_type": "optionList"
+                }
+            ]
         }
     }
 }

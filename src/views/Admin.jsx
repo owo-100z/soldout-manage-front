@@ -9,6 +9,7 @@ const services = [
   {code: 'baemin', label: '배민'},
   {code: 'coupang', label: '쿠팡'},
   {code: 'ddangyo', label: '땡겨요'},
+  {code: 'yogiyo', label: '요기요'},
 ]
 
 export default function Setting() {
@@ -59,6 +60,12 @@ export default function Setting() {
               return source.find(t => t.menu_id === menu.menu_id);
             } else if (_type === 'optionList') {
               return source.find(t => t.optn_id === menu.optn_id);
+            }
+          } else if (v === 'yogiyo') {
+            if (_type === 'menuList') {
+              return source.find(t => t.product_id === menu.product_id);
+            } else if (_type === 'optionList') {
+              return source.find(t => t.option_id === menu.option_id);
             }
           }
 
@@ -180,6 +187,12 @@ export default function Setting() {
           } else if (_type === 'optionList') {
             return t?.optn_id === v?.optn_id;
           }
+        } else if (selectedService.code === 'yogiyo') {
+          if (_type === 'menuList') {
+            return t?.product_id === v?.product_id;
+          } else if (_type === 'optionList') {
+            return t?.option_id === v?.option_id;
+          }
         }
 
         return JSON.stringify(t) === JSON.stringify(v);
@@ -216,6 +229,12 @@ export default function Setting() {
             return t?.menu_id === target?.menu_id;
           } else if (_type === 'optionList') {
             return t?.optn_id === target?.optn_id;
+          }
+        } else if (selectedService.code === 'yogiyo') {
+          if (_type === 'menuList') {
+            return t?.product_id === target?.product_id;
+          } else if (_type === 'optionList') {
+            return t?.option_id === target?.option_id;
           }
         }
 
@@ -277,9 +296,9 @@ export default function Setting() {
                     <tbody>
                       {menuList[selectedService.code]['menuList'][v] ? menuList[selectedService.code]['menuList'][v].map((vv, ii) => (
                         <tr key={ii}>
-                          <td className={isSelectedMenu(selectedList, vv) + filterMenu((vv.optn_nm || vv.menu_nm || vv.dishName || vv.menuName || vv.optionName || vv.optionItemName))}
+                          <td className={isSelectedMenu(selectedList, vv) + filterMenu((vv.optn_nm || vv.menu_nm || vv.dishName || vv.menuName || vv.optionName || vv.optionItemName || vv.name))}
                             onClick={(e)=>{selectList(e, vv, v);}}>
-                            { vv.optn_nm || vv.menu_nm || vv.dishName || vv.menuName || vv.optionName || vv.optionItemName }
+                            { vv.optn_nm || vv.menu_nm || vv.dishName || vv.menuName || vv.optionName || vv.optionItemName || vv.name }
                           </td>
                         </tr>
                       )) : (
@@ -310,7 +329,7 @@ export default function Setting() {
                     <tr key={i}>
                       <td>
                         <strong>{ v._type === 'menuList' ? '[메뉴]' : v._type === 'optionList' ? '[옵션]' : `[${v._type}]` }</strong>
-                        { v.optn_nm || v.menu_nm || v.dishName || v.menuName || v.optionName || v.optionItemName }
+                        { v.optn_nm || v.menu_nm || v.dishName || v.menuName || v.optionName || v.optionItemName || v.name }
                       </td>
                     </tr>
                   )) : (

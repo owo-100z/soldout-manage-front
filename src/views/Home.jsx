@@ -26,6 +26,7 @@ const services = [
   {code: 'baemin', label: '배민'},
   {code: 'coupang', label: '쿠팡'},
   {code: 'ddangyo', label: '땡겨요'},
+  {code: 'yogiyo', label: '요기요'},
 ]
 
 export default function Home() {
@@ -36,7 +37,7 @@ export default function Home() {
     const [btnMenuList, setBtnMenuList] = useState({});
 
     useEffect(() => {
-        comm.log(getToday());
+        // comm.log(getToday());
         getSettings();
     }, [])
 
@@ -58,6 +59,8 @@ export default function Home() {
 
         const btns = settings.buttons;
         const selectedList = settings.selectedList;
+
+        comm.log(selectedList);
 
         setLoaded(true);
         setButtons(btns);
@@ -131,10 +134,10 @@ export default function Home() {
         
                 const menuList = service === 'baemin' ? m?.map(t => t.menuId)
                                 : service === 'coupang' ? m?.map(t => t.dishId)
-                                : service === 'ddangyo' ? m : [];
+                                : service === 'ddangyo' || service === 'yogiyo' ? m : [];
                 const optionList = service === 'baemin' ? o?.map(t => t.optionId)
                                 : service === 'coupang' ? o?.map(t => t.optionItemId)
-                                : service === 'ddangyo' ? o : [];
+                                : service === 'ddangyo' || service === 'yogiyo' ? o : [];
 
                 return {menuList, optionList};
             }
@@ -158,19 +161,21 @@ export default function Home() {
 
             }
         } else {
-        const url = `/${selectedService}/${endpoint}`;
-        const body = makeParam(selectedService);
+            const url = `/${selectedService}/${endpoint}`;
+            const body = makeParam(selectedService);
 
-        if (utils.isEmpty(body)) {
-            const res = await comm.api(url, { method: 'POST', body });
-    
-            comm.log(res);
-            if (res?.success) {
-                success[selectedService] = res.data;
-            } else {
-                fail[selectedService] = res.error;
+            comm.log(body);
+
+            if (!utils.isEmpty(body)) {
+                const res = await comm.api(url, { method: 'POST', body });
+        
+                comm.log(res);
+                if (res?.success) {
+                    success[selectedService] = res.data;
+                } else {
+                    fail[selectedService] = res.error;
+                }
             }
-        }
         }
 
         if (Object.keys(fail).length > 0) {
@@ -197,7 +202,7 @@ export default function Home() {
                     <div className="card-body items-center text-center">
                         <div className="join">
                             {addMinutesArr && addMinutesArr.map((v, i) => (
-                                <button className="btn btn-md" onClick={() => {handleAddMinutes(v.minutes);}}>{v.label}</button>
+                                <button key={i} className="btn btn-md" onClick={() => {handleAddMinutes(v.minutes);}}>{v.label}</button>
                             ))}
                             <button className="btn btn-md" onClick={() => {setDateTime(getToday())}}>초기화</button>
                         </div>
