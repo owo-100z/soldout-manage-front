@@ -1,4 +1,4 @@
-const apiBaseUrl = 'https://quantitative-commitment-qualified-stayed.trycloudflare.com' + '/api';
+const apiBaseUrl = 'https://grateful-racks-orders-relate.trycloudflare.com' + '/api';
 
 import React from "react";
 import ReactDOM from "react-dom/client";
