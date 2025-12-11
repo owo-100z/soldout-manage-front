@@ -72,7 +72,7 @@ export default function DateTimePicker({ initialValue, onChange, showTime = true
 
   // ✅ 시간 리스트 (30분 단위)
   const times = [];
-  for (let h = 0; h < 24; h++) {
+  for (let h = 11; h < 24; h++) {
     for (let m = 0; m < 60; m += 30) {
       times.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
     }
@@ -89,7 +89,7 @@ export default function DateTimePicker({ initialValue, onChange, showTime = true
         className="btn bg-white border-gray w-full justify-between rounded-lg opacity-70"
         onClick={openDateTimePicker}
       >
-        <span>{formatted}</span>
+        <span className="text-2xl">{formatted}</span>
         <FaCalendarAlt />
       </button>
 
