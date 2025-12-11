@@ -80,16 +80,16 @@ export default function DateTimePicker({ initialValue, onChange, showTime = true
 
   const formatted =
     selectedDate && selectedTime
-      ? `${selectedDate.format("YYYY.MM.DD")} ${showTime ? selectedTime : ''}`
+      ? `${selectedDate.format("MM월 DD일")} ${showTime ? selectedTime : ''} 까지`
       : "날짜와 시간을 선택하세요";
 
   return (
     <div className="relative w-full mx-auto">
       <button
-        className="btn bg-white border-gray w-full justify-between rounded-lg opacity-70"
+        className="btn bg-white border-gray w-full justify-between rounded-lg opacity-70 h-15"
         onClick={openDateTimePicker}
       >
-        <span className="text-2xl">{formatted}</span>
+        <span className="text-3xl md:text-2xl">{formatted}</span>
         <FaCalendarAlt />
       </button>
 

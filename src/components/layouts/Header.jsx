@@ -13,20 +13,20 @@ export default function Header() {
 
   const upscale = () => {
     document.querySelector('body').classList.remove(scale);
-    document.querySelector('header').classList.remove('top-25', 'top-45');
-    document.querySelector('#home').classList.remove('mt-20', 'mt-40');
+    document.querySelector('header').classList.remove('top-45', 'top-85', 'md:top-25', 'md:top-45');
+    document.querySelector('#home').classList.remove('mt-80', 'mt-40', 'md:mt-20', 'md:mt-40');
 
     if (scale === 'scale-100') {
       setScale('scale-120');
       document.querySelector('body').classList.add('scale-120');
-      document.querySelector('header').classList.add('top-25');
-      document.querySelector('#home').classList.add('mt-20');
+      document.querySelector('header').classList.add('top-45', 'md:top-25');
+      document.querySelector('#home').classList.add('mt-40', 'md:mt-20');
     }
     else if (scale === 'scale-120') {
       setScale('scale-140');
       document.querySelector('body').classList.add('scale-140');
-      document.querySelector('header').classList.add('top-45');
-      document.querySelector('#home').classList.add('mt-40');
+      document.querySelector('header').classList.add('top-85', 'md:top-45');
+      document.querySelector('#home').classList.add('mt-80', 'md:mt-40');
     } else {
       setScale('scale-100');
     }

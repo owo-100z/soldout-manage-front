@@ -190,17 +190,17 @@ export default function Home() {
         <Layout>
             <Header />
             <div id="home" className="flex w-full max-w-180 flex-col gap-1 md:py-15">
-                <div className="card bg-base-200 rounded-box grid p-3 place-items-center">
-                <div className="filter flex justify-center">
-                    <input className="btn filter-reset text-2xl" type="radio" value="all" name="service" aria-label="All" onChange={(e) => setSelectedService(e.target.value)}/>
-                    {services && services.map((v, i) => (
-                    <input key={i} className="btn text-2xl" type="radio" value={v.code} name="service" aria-label={v.label} onChange={(e) => setSelectedService(e.target.value)}/>
-                    ))}
+                <div className="bg-base-200 rounded-box grid p-3 place-items-center">
+                    <div className="filter flex justify-center">
+                        <input className="btn filter-reset text-2xl" type="radio" value="all" name="service" aria-label="All" onChange={(e) => setSelectedService(e.target.value)}/>
+                        {services && services.map((v, i) => (
+                        <input key={i} className="btn text-2xl" type="radio" value={v.code} name="service" aria-label={v.label} onChange={(e) => setSelectedService(e.target.value)}/>
+                        ))}
+                    </div>
                 </div>
-                </div>
-                <div className="card bg-base-200 rounded-box grid p-3 place-items-center">
-                    <div className="card-body items-center text-center">
-                        <div className="join">
+                <div className="bg-base-200 rounded-box grid p-3 place-items-center">
+                    <div className="items-center text-center">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full mb-3">
                             {addMinutesArr && addMinutesArr.map((v, i) => (
                                 <button key={i} className="btn btn-md text-2xl" onClick={() => {handleAddMinutes(v.minutes);}}>{v.label}</button>
                             ))}
@@ -209,8 +209,8 @@ export default function Home() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                             <DateTimePicker initialValue={dateTime} onChange={(res) => {setDateTime(res?.format('YYYY-MM-DD HH:mm'))}} />
                             <div className="justify-around grid grid-cols-2 w-full gap-1">
-                                <button className="btn btn-md bg-error/40 text-3xl" onClick={() => {tmpStop(true)}}>임시중지</button>
-                                <button className="btn btn-md bg-info/40 text-3xl" onClick={() => {tmpStop(false)}}>임시중지해제</button>
+                                <button className="btn btn-md bg-error/40 text-3xl h-15" onClick={() => {tmpStop(true)}}>임시중지</button>
+                                <button className="btn btn-md bg-info/40 text-3xl h-15" onClick={() => {tmpStop(false)}}>임시중지해제</button>
                             </div>
                         </div>
                     </div>
