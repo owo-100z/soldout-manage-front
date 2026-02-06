@@ -1,4 +1,4 @@
-const apiBaseUrl = 'https://sheriff-coated-videos-ports.trycloudflare.com' + '/api';
+const apiBaseUrl = 'https://joining-giant-alex-drive.trycloudflare.com' + '/api';
 
 import React from "react";
 import ReactDOM from "react-dom/client";
