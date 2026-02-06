@@ -1,4 +1,4 @@
-const apiBaseUrl = 'https://atlanta-myers-pet-recorded.trycloudflare.com' + '/api';
+const apiBaseUrl = 'https://paint-laboratory-referring-easily.trycloudflare.com' + '/api';
 
 import React from "react";
 import ReactDOM from "react-dom/client";
