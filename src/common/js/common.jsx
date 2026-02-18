@@ -1,4 +1,4 @@
-const apiBaseUrl = 'https://mature-cleaner-rpg-pdas.trycloudflare.com' + '/api';
+const apiBaseUrl = 'https://socks-anyone-boards-upc.trycloudflare.com' + '/api';
 
 import React from "react";
 import ReactDOM from "react-dom/client";
