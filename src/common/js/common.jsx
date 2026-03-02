@@ -1,4 +1,4 @@
-const apiBaseUrl = 'https://socks-anyone-boards-upc.trycloudflare.com' + '/api';
+const apiBaseUrl = 'https://technique-const-representative-sunday.trycloudflare.com' + '/api';
 
 import React from "react";
 import ReactDOM from "react-dom/client";
