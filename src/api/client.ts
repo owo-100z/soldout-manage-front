@@ -3,7 +3,7 @@ import axios from 'axios';
 const client = axios.create({
   // 🌟 처음엔 비워두거나 기본값을 적어줍니다.
   baseURL: 'http://localhost:3000', 
-  timeout: 30000,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   },
