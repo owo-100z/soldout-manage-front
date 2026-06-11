@@ -38,9 +38,17 @@ export default function SettingsPage() {
     staleTime: Infinity,
   });
 
+  // 백엔드에서 가져온 데이터
+  const groupsDataParsed = useMemo(() => {
+    if (groupsData?.data?.menuGroups) {
+      return groupsData.data.menuGroups;
+    }
+    return {};
+  }, [groupsData]);
+
   // 로컬 스토리지에서 데이터 로드 (기존 데이터를 새 형식으로 변환)
   useEffect(() => {
-    const savedData = localStorage.getItem('menuGroups');
+    const savedData = groupsDataParsed ||localStorage.getItem('menuGroups');
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
@@ -78,15 +86,7 @@ export default function SettingsPage() {
         console.error('Failed to parse menuGroups from localStorage:', e);
       }
     }
-  }, []);
-
-  // 백엔드에서 가져온 데이터
-  const groupsDataParsed = useMemo(() => {
-    if (groupsData?.data?.menuGroups) {
-      return groupsData.data.menuGroups;
-    }
-    return {};
-  }, [groupsData]);
+  }, [groupsDataParsed]);
 
   const serviceData = (data?.data as any)?.[selectedService];
   const normalized = serviceData ? normalizeMenuData(selectedService, serviceData) : { menuList: [], optionList: [] };

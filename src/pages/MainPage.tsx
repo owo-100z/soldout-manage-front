@@ -31,11 +31,11 @@ export default function MainPage() {
     if (groupsData?.data?.menuGroups) {
       return groupsData.data.menuGroups;
     }
-    return {};
+    return '{}';
   }, [groupsData]);
 
   const allGroups = useMemo(() => {
-    return { ...localGroups, ...groupsDataParsed };
+    return { ...localGroups, ...JSON.parse(groupsDataParsed) };
   }, [localGroups, groupsDataParsed]);
 
   // 전체 서비스 메뉴 정규화 (메인 페이지에서는 사용하지 않음 - MenuGrid가 groups 사용)
