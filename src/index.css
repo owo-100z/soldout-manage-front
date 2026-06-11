@@ -1,92 +1,185 @@
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: silk --default, garden --prefersdark;
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* 정갈한 글씨체 */
-@font-face {
-    font-family: 'Paperozi';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
-    font-weight: 500;
-    font-display: swap;
+:root {
+    --font-scale: 1.1;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* 날려쓴 필기체 */
-@font-face {
-    font-family: 'PerpetualSnow';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2508-2@1.0/PermanentSnow.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* 정갈한 귀여운 글씨체 */
-@font-face {
-    font-family: 'OngleipKonkon';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2412-1@1.0/Ownglyph_corncorn-Rg.woff2') format('woff2');
-    font-weight: normal;
-    font-display: swap;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    font-size: calc(1rem * var(--font-scale, 1.1));
+    }
+  html {
+    @apply font-sans;
+    }
+  
+  /* 폰트 줌 시 Heading 크기 조정 */
+  h1, h2, h3, h4, h5, h6 {
+    font-size: calc(1em * var(--font-scale, 1.1));
+  }
+  
+  /* 버튼과 입력 필드도 스케일링 */
+  button, input, select, textarea {
+    font-size: calc(1em * var(--font-scale, 1.1));
+  }
+  
+  /* 테이블 셀 스케일링 */
+  td, th {
+    font-size: calc(0.875rem * var(--font-scale, 1.1));
+  }
+  
+  /* 라벨 스케일링 */
+  label {
+    font-size: calc(0.875rem * var(--font-scale, 1.1));
+  }
+  
+  /* 모든 텍스트 관련 요소에 폰트 스케일 적용 */
+  p, span, div, a, li, td, th, button, input, select, textarea, label, h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+  }
 }
 
-/* 그냥귀여운 글씨체 */
-@font-face {
-    font-family: 'OmuDaye';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
-    font-weight: normal;
-    font-display: swap;
-}
-
-/* 카페24러빙유체 - 간지나는 영어 필기체 */
-@font-face {
-    font-family: 'Cafe24LovingU';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2405-3@1.1/Cafe24Lovingu.woff2') format('woff2');
-    font-weight: normal;
-    font-display: swap;
-}
-
-/* 강원교육새움체 - 따뜻한 손글씨 */
-@font-face {
-    font-family: 'GangwonEducationSaeum';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEduSaeeum_OTFMediumA.woff') format('woff');
-    font-weight: normal;
-    font-display: swap;
-}
-
-html {
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
-  scrollbar-width: none;
-}
-
-body {
-    width: 100%;
-    font-family: 'Paperozi', sans-serif;
-    word-break: keep-all;
-}
-
-.menu-font {
-    font-family: 'OngleipKonkon';
-}
-
-.font-saeum {
-    font-family: 'GangwonEducationSaeum';
-}
-
-.font-paperozi {
-    font-family: 'Paperozi';
-}
-
-.font-ongle {
-    font-family: 'OngleipKonkon';
-}
-
-.font-snow {
-    font-family: 'PerpetualSnow';
-}
-
-.font-omu {
-    font-family: 'OmuDaye';
-}
-
-.font-loving {
-    font-family: 'Cafe24LovingU';
+/* 폰트 줌 시 레이아웃 보호를 위한 추가 스타일 */
+@layer utilities {
+  /* 줌 안전 컨테이너 */
+  .zoom-safe {
+    min-height: 0;
+    overflow: hidden;
+  }
+  
+  /* 줌 시 flex item이 넘치지 않도록 */
+  .zoom-flex {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  
+  /* 텍스트가 넘칠 때 줄임표시 */
+  .zoom-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* 그리드 줌 대응 */
+  .zoom-grid {
+    min-width: 0;
+    overflow: hidden;
+  }
 }
