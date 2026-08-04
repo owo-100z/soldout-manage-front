@@ -28,7 +28,7 @@ function summarize(r: ServiceResult): { icon: string; text: string; tone: string
   if (r.action) {
     return {
       icon: '✓',
-      text: r.alreadyReleased ? '이미 해제됨' : ACTION_LABEL[r.action],
+      text: r.alreadyReleased ? '이미 해제됨' : ACTION_LABEL[r.action] || '성공',
       tone: 'text-emerald-600',
     };
   }
