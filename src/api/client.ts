@@ -1,25 +1,31 @@
 import axios from 'axios';
+import { getApiUrl } from './config';
 
 const client = axios.create({
-  // 🌟 처음엔 비워두거나 기본값을 적어줍니다.
-  baseURL: 'http://localhost:3000', 
-  timeout: 60000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  timeout: 120_000,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// 🌟 핵심: API 요청이 출발하기 직전에 인터셉터가 가로채서 최신 주소를 바인딩합니다.
+/**
+ * 백엔드 주소는 빌드에 굽지 않는다. cloudflared 퀵터널이라 재시작마다 바뀌기 때문에,
+ * 요청이 나가기 직전에 window.API_URL의 현재 값을 읽어 붙인다.
+ */
 client.interceptors.request.use((config) => {
-  const currentApiUrl = (window as any).API_URL;
-  
-  if (currentApiUrl) {
-    config.baseURL = currentApiUrl;
-  }
-  
+  config.baseURL = getApiUrl();
   return config;
-}, (error) => {
-  return Promise.reject(error);
 });
+
+/** 백엔드가 { ok:false, error } 로 주는 메시지를 살려서 던진다. */
+client.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    const message =
+      err.response?.data?.error ??
+      (err.code === 'ECONNABORTED'
+        ? '요청 시간이 초과되었습니다'
+        : err.message || '서버에 연결할 수 없습니다');
+    return Promise.reject(new Error(message));
+  }
+);
 
 export default client;

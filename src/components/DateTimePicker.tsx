@@ -1,221 +1,182 @@
-import { useState, useEffect, useRef } from "react";
-import dayjs, { type Dayjs } from "dayjs";
-import Select from '@/components/ui/select'
+import { useEffect, useRef, useState } from 'react';
+import dayjs, { type Dayjs } from 'dayjs';
+import { combine, formatLabel, HOURS, MINUTES, pad2 } from '../lib/datetime';
 
-interface DateTimePickerProps {
-  initialValue?: string;
-  onChange: (value: Dayjs | null) => void;
-  showTime?: boolean;
+interface Props {
+  value: Dayjs;
+  onChange: (next: Dayjs) => void;
+  disabled?: boolean;
 }
 
-// 한글 월 이름
-const MONTH_NAMES = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+/**
+ * 달력 + 시/분 선택.
+ *
+ * 구 버전의 P0 버그 두 가지를 피한다.
+ *  1) 마운트 effect가 시/분을 11:00으로 하드코딩해 무엇을 골라도 11:00이 전송됐다
+ *     → value에서 실제 시/분을 읽는다.
+ *  2) select의 value가 "0"인데 옵션은 "00"이라 매칭에 실패해 30분이 표시되지 않았다
+ *     → 양쪽 모두 pad2로 2자리 문자열을 쓴다.
+ */
+export default function DateTimePicker({ value, onChange, disabled }: Props) {
+  const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState(() => value.startOf('month'));
+  const [draft, setDraft] = useState(value);
+  const ref = useRef<HTMLDivElement>(null);
 
-export default function DateTimePicker({ initialValue, onChange, showTime = true }: DateTimePickerProps) {
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const [selectedTime, setSelectedTime] = useState("");
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
-  const [isOpen, setIsOpen] = useState(false);
-
-  const [hour, setHour] = useState(11);
-  const [minute, setMinute] = useState(0);
-  
-  const today = dayjs();
-  const pickerRef = useRef<HTMLDivElement>(null);
-
-  // mount 시 초기값 설정
+  // 열 때마다 현재 값에서 초안을 다시 만든다
   useEffect(() => {
-    if (initialValue) {
-      const d = dayjs(initialValue);
-      setSelectedDate(d.startOf("day"));
-      setSelectedTime(d.format("HH:mm"));
-      setCurrentMonth(d.startOf("month"));
-      setHour(11);
-      setMinute(0);
+    if (open) {
+      setDraft(value);
+      setMonth(value.startOf('month'));
     }
-  }, [initialValue]);
+  }, [open, value]);
 
-  // 달력용 날짜 배열
-  const getDaysInMonth = (month: Dayjs) => {
-    const start = month.startOf("month");
-    const end = month.endOf("month");
-    const days: Dayjs[] = [];
-    for (let d = start; d.isBefore(end) || d.isSame(end, "day"); d = d.add(1, "day")) {
-      days.push(d);
-    }
-    return days;
-  };
-
-  // 값 변경 시 부모로 전달
-  const setDateTime = () => {
-    if (onChange && selectedDate) {
-      let combined = selectedDate;
-
-      if (showTime && selectedTime) {
-        const [hh, mm] = [hour, minute];
-        combined = selectedDate.hour(hh).minute(mm);
-      }
-
-      onChange(combined);
-    }
-  
-    setIsOpen(false);
-  };
-
-  // 피커 열기/닫기
-  const openDateTimePicker = () => {
-    if (isOpen) {
-      if (initialValue) {
-        const d = dayjs(initialValue);
-        setSelectedDate(d.startOf("day"));
-        setSelectedTime(d.format("HH:mm"));
-        setCurrentMonth(d.startOf("month"));
-        if (onChange) {
-          onChange(d);
-        }
-      } else {
-        setSelectedDate(null);
-        setSelectedTime('');
-        setCurrentMonth(dayjs());
-      }
-    }
-
-    setIsOpen(!isOpen);
-  };
-
-  const days = getDaysInMonth(currentMonth);
-
-  // 시간 리스트 (30분 단위, 11시~23시)
-  const times: string[] = [];
-  for (let h = 11; h < 24; h++) {
-    for (let m = 0; m < 60; m += 30) {
-      times.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
-    }
-  }
-
-  const hours: string[] = [];
-  for (let h = 11; h < 24; h++) {
-    hours.push(`${String(h).padStart(2, "0")}`);
-  }
-
-  const minutes: string[] = [];
-  for (let m = 0; m < 60; m += 30) {
-    minutes.push(`${String(m).padStart(2, "0")}`);
-  }
-
-  const formatted =
-    selectedDate && selectedTime
-      ? `${selectedDate.format("MM월 DD일")} ${showTime ? selectedTime : ''} 까지`
-      : "날짜와 시간을 선택하세요";
-
-  // 외부 클릭 시 닫기
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
+    if (!open) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const start = month.startOf('month');
+  const days: (Dayjs | null)[] = [
+    ...Array.from({ length: start.day() }, () => null),
+    ...Array.from({ length: month.daysInMonth() }, (_, i) => start.add(i, 'day')),
+  ];
+
+  const confirm = () => {
+    onChange(draft);
+    setOpen(false);
+  };
 
   return (
-    <div className="relative w-full" ref={pickerRef}>
+    <div className="relative" ref={ref}>
       <button
-        className="w-full px-3 py-2 rounded-lg border-2 border-zinc-200 bg-white hover:bg-zinc-50 transition-colors flex items-center justify-between gap-2 h-12"
-        onClick={openDateTimePicker}
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        className="flex h-14 w-full items-center justify-between rounded-xl border-2 border-zinc-200 bg-white px-4 text-left font-bold text-zinc-800 disabled:opacity-50"
       >
-        <span className="w-full text-start text-[5vw] text-zinc-700 md:text-3xl font-bold whitespace-nowrap">{formatted}</span>
-        <svg className="w-4 h-4 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
+        <span className="text-lg">{formatLabel(value)} 까지</span>
+        <span aria-hidden="true" className="text-zinc-400">
+          ▾
+        </span>
       </button>
 
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-white border border-zinc-200 shadow-lg rounded-2xl p-4">
-          {/* 달력 헤더 */}
-          <div className="flex items-center justify-between mb-2">
+      {open && (
+        <div
+          role="dialog"
+          aria-label="종료 일시 선택"
+          className="absolute left-0 right-0 z-30 mt-2 rounded-2xl border border-zinc-200 bg-white p-4 shadow-xl"
+        >
+          <div className="flex items-center justify-between">
             <button
-              className="w-8 h-8 rounded hover:bg-zinc-100 flex items-center justify-center text-sm text-zinc-600"
-              onClick={() => setCurrentMonth(currentMonth.subtract(1, "month"))}
+              type="button"
+              aria-label="이전 달"
+              onClick={() => setMonth((m) => m.subtract(1, 'month'))}
+              className="rounded-lg px-3 py-1.5 text-zinc-600 hover:bg-zinc-100"
             >
-              ◀
+              ‹
             </button>
-            <div className="font-semibold text-base text-zinc-800">
-              {currentMonth.year()}년 {MONTH_NAMES[currentMonth.month()]}
-            </div>
+            <span className="font-bold text-zinc-800">{month.format('YYYY년 M월')}</span>
             <button
-              className="w-8 h-8 rounded hover:bg-zinc-100 flex items-center justify-center text-sm text-zinc-600"
-              onClick={() => setCurrentMonth(currentMonth.add(1, "month"))}
+              type="button"
+              aria-label="다음 달"
+              onClick={() => setMonth((m) => m.add(1, 'month'))}
+              className="rounded-lg px-3 py-1.5 text-zinc-600 hover:bg-zinc-100"
             >
-              ▶
+              ›
             </button>
           </div>
 
-          {/* 요일 */}
-          <div className="grid grid-cols-7 text-center text-xs font-semibold text-zinc-500 mb-1">
-            {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
-              <div key={d}>{d}</div>
+          <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs text-zinc-400">
+            {['일', '월', '화', '수', '목', '금', '토'].map((d) => (
+              <span key={d}>{d}</span>
             ))}
           </div>
 
-          {/* 날짜 */}
-          <div className="grid grid-cols-7 text-center text-sm">
-            {Array(days[0].day())
-              .fill(null)
-              .map((_, i) => (
-                <div key={`empty-${i}`} className="h-8" />
-              ))}
-
-            {days.map((day) => {
-              const isToday = day.isSame(today, "day");
-              const isSelected = selectedDate && day.isSame(selectedDate, "day");
-              return (
+          <div className="mt-1 grid grid-cols-7 gap-1">
+            {days.map((day, i) =>
+              day === null ? (
+                <span key={`pad-${i}`} />
+              ) : (
                 <button
-                  key={day.format("YYYY-MM-DD")}
-                  onClick={() => setSelectedDate(day)}
-                  className={`p-2 rounded-full text-sm transition-colors cursor-pointer ${
-                    isSelected
-                      ? "bg-rose-500/50 text-white"
-                      : isToday
-                      ? "bg-zinc-300 text-zinc-800 font-semibold"
-                      : "hover:bg-zinc-200"
+                  key={day.format('YYYY-MM-DD')}
+                  type="button"
+                  aria-label={day.format('YYYY년 M월 D일')}
+                  aria-current={day.isSame(draft, 'day') ? 'date' : undefined}
+                  onClick={() => setDraft(combine(day, draft.hour(), draft.minute()))}
+                  className={`aspect-square rounded-lg text-sm font-medium transition-colors ${
+                    day.isSame(draft, 'day')
+                      ? 'bg-zinc-900 text-white'
+                      : day.isBefore(dayjs(), 'day')
+                        ? 'text-zinc-300'
+                        : 'text-zinc-700 hover:bg-zinc-100'
                   }`}
                 >
                   {day.date()}
                 </button>
-              );
-            })}
+              )
+            )}
           </div>
 
-          {/* 시간 선택 */}
-          {showTime && (
-            <div className="mt-4 grid grid-cols-2 gap-1">
-              <Select
-                value={String(hour)}
-                onChange={(v) => setHour(Number(v))}
-                options={hours.map(t => ({label: t, value: t}))}
-                label="시간 선택"
-              />
-              <Select
-                value={String(minute)}
-                onChange={(v) => setMinute(Number(v))}
-                options={minutes.map(t => ({label: t, value: t}))}
-                label="분 선택"
-              />
-            </div>
-          )}
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <label className="block">
+              <span className="mb-1 block text-xs font-medium text-zinc-500">시</span>
+              <select
+                value={pad2(draft.hour())}
+                onChange={(e) => setDraft(combine(draft, Number(e.target.value), draft.minute()))}
+                className="h-12 w-full rounded-xl border-2 border-zinc-200 bg-white px-3 font-bold text-zinc-800"
+              >
+                {HOURS.map((h) => (
+                  <option key={h} value={h}>
+                    {h}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          {/* 확인 버튼 */}
-          <div className="mt-4 flex justify-end">
+            <label className="block">
+              <span className="mb-1 block text-xs font-medium text-zinc-500">분</span>
+              <select
+                value={pad2(Math.floor(draft.minute() / 10) * 10)}
+                onChange={(e) => setDraft(combine(draft, draft.hour(), Number(e.target.value)))}
+                className="h-12 w-full rounded-xl border-2 border-zinc-200 bg-white px-3 font-bold text-zinc-800"
+              >
+                {MINUTES.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="mt-4 flex gap-2">
             <button
-              className="btn w-full rounded-xl bg-zinc-800 hover:bg-zinc-900 text-white"
-              disabled={!selectedDate || (showTime && !selectedTime)}
-              onClick={setDateTime}
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex-1 rounded-xl bg-zinc-100 px-4 py-3 font-semibold text-zinc-600"
             >
-              선택 완료
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={confirm}
+              className="flex-1 rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white"
+            >
+              {formatLabel(draft)} 선택
             </button>
           </div>
         </div>

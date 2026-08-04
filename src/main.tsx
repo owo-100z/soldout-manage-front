@@ -1,30 +1,17 @@
-// src/main.tsx
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import App from './App';
+import { loadApiUrl } from './api/config';
 
-async function initApp() {
-  try {
-    const gistUrl = 'https://gist.githubusercontent.com/owo-100z/1556b55396916aeb06571471049c1cb4/raw/config.json';
-    const cacheBuster = `?v=${Date.now()}`;
+const root = document.getElementById('root');
+if (!root) throw new Error('#root 엘리먼트를 찾지 못했습니다');
 
-    const response = await fetch(`${gistUrl}${cacheBuster}`, { cache: 'no-store' });
-    const config = await response.json();
-    
-    // 🌟 다른 파일에서 import 안 해도 언제든 꺼내 쓸 수 있게 window에 박아버립니다!
-    (window as any).API_URL = config.API_URL;
-    console.log("🔥 전역에 등록된 API 주소:", (window as any).API_URL);
-  } catch (error) {
-    console.error("Gist 로드 실패, 기본 주소로 대체합니다.", error);
-    (window as any).API_URL = "http://localhost:3000"; 
-  }
-
-  createRoot(document.getElementById('root')!).render(
+// 마운트 즉시 API 요청이 나가므로, 주소를 심은 뒤에 렌더링해야 한다
+loadApiUrl().then(() => {
+  createRoot(root).render(
     <StrictMode>
       <App />
-    </StrictMode>,
+    </StrictMode>
   );
-}
-
-initApp();
+});

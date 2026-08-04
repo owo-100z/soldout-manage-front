@@ -2,51 +2,52 @@ import { ALL_SERVICES, SERVICE_LABELS, type ServiceKey } from '../types';
 
 interface Props {
   selected: ServiceKey[];
-  onChange: (services: ServiceKey[]) => void;
+  onChange: (next: ServiceKey[]) => void;
+  disabled?: boolean;
 }
 
-export default function ServiceSelector({ selected, onChange }: Props) {
-  const toggle = (service: ServiceKey) => {
-    if (selected.includes(service)) {
-      if (selected.length === 1) return; // 최소 1개 선택
-      onChange(selected.filter((s) => s !== service));
-    } else {
-      onChange([...selected, service]);
-    }
-  };
+export default function ServiceSelector({ selected, onChange, disabled }: Props) {
+  const allSelected = selected.length === ALL_SERVICES.length;
 
-  const isAll = selected.length === ALL_SERVICES.length;
-
-  const toggleAll = () => {
-    onChange(isAll ? [ALL_SERVICES[0]] : [...ALL_SERVICES]);
+  const toggle = (key: ServiceKey) => {
+    const next = selected.includes(key)
+      ? selected.filter((s) => s !== key)
+      : [...ALL_SERVICES].filter((s) => s === key || selected.includes(s));
+    // 최소 1개는 남긴다 — 대상이 없으면 아무 동작도 할 수 없다
+    if (next.length) onChange(next);
   };
 
   return (
-    // 부모 div에 가로 스크롤(overflow-x-auto)과 스크롤바 숨김 처리
-    <div className="flex items-center gap-2 w-full overflow-x-auto scrollbar-hide">
+    <div className="flex flex-wrap gap-2" role="group" aria-label="플랫폼 선택">
       <button
-        onClick={toggleAll}
-        className={`flex-1 min-w-fit whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-semibold transition-all border ${
-          isAll
-            ? 'bg-zinc-800 text-white border-zinc-800'
-            : 'bg-transparent text-zinc-500 border-zinc-300 hover:border-zinc-500'
+        type="button"
+        disabled={disabled}
+        aria-pressed={allSelected}
+        onClick={() => onChange([...ALL_SERVICES])}
+        className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 ${
+          allSelected ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
         }`}
       >
         전체
       </button>
-      {ALL_SERVICES.map((service) => (
-        <button
-          key={service}
-          onClick={() => toggle(service)}
-          className={`flex-1 min-w-fit whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-semibold transition-all border ${
-            selected.includes(service)
-              ? 'bg-zinc-800 text-white border-zinc-800'
-              : 'bg-transparent text-zinc-500 border-zinc-300 hover:border-zinc-500'
-          }`}
-        >
-          {SERVICE_LABELS[service]}
-        </button>
-      ))}
+
+      {ALL_SERVICES.map((key) => {
+        const on = selected.includes(key);
+        return (
+          <button
+            key={key}
+            type="button"
+            disabled={disabled}
+            aria-pressed={on}
+            onClick={() => toggle(key)}
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 ${
+              on ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+            }`}
+          >
+            {SERVICE_LABELS[key]}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -1,270 +1,252 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import GroupManager from '../components/GroupManager';
-import { useInitCacheAndRefresh, useShopInfo } from '../hooks/useMenu';
-import { ALL_SERVICES, SERVICE_LABELS, type ServiceKey } from '../types';
-import { normalizeMenuData } from '../utils/normalize';
-import { fetchMenuGroups, saveMenuGroups } from '../api/api';
+import { useMemo, useState } from 'react';
+import Header from '../components/Header';
+import { normalizeMenus, normalizeOptions } from '../lib/normalize';
+import { useMenuGroups, useRefreshMenus, useSaveMenuGroups, useShopInfo } from '../hooks/useApi';
+import { ALL_SERVICES, SERVICE_LABELS, type MenuGroups, type ServiceKey } from '../types';
 
-// 새로운 그룹 데이터 타입: { baemin: { "그룹명": { menu: [아이템ID, ...], option: [아이템ID, ...] } }, ... }
-type GroupItemData = {
-  menu: string[];
-  option: string[];
-};
-type GroupDataByService = Record<ServiceKey, Record<string, GroupItemData>>;
+type Tab = 'menu' | 'option';
 
 export default function SettingsPage() {
-  const navigate = useNavigate();
-  const [selectedService, setSelectedService] = useState<ServiceKey>('baemin');
-  const initAndRefresh = useInitCacheAndRefresh();
+  const [service, setService] = useState<ServiceKey>('baemin');
+  const [tab, setTab] = useState<Tab>('menu');
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [draft, setDraft] = useState<MenuGroups | null>(null);
 
-  // 공통 그룹 목록 (모든 서비스에서 공유)
-  const [groupNames, setGroupNames] = useState<string[]>([]);
+  const shopQuery = useShopInfo([service]);
+  const groupsQuery = useMenuGroups();
+  const save = useSaveMenuGroups();
+  const refresh = useRefreshMenus();
 
-  // 서비스별 그룹 데이터: { baemin: { "그룹1": { menu: [...], option: [...] }, ... }, coupang: { ... } }
-  const [groupDataByService, setGroupDataByService] = useState<GroupDataByService>({
-    baemin: {},
-    coupang: {},
-    ddangyo: {},
-    yogiyo: {},
-  });
+  // 저장 전 편집 상태. 서버 값이 오기 전에는 서버 값을 그대로 보여준다.
+  const groups: MenuGroups = draft ?? groupsQuery.data ?? {};
 
-  const { data, isLoading } = useShopInfo();
+  const items = useMemo(() => {
+    const data = shopQuery.data?.results?.[service];
+    return tab === 'menu'
+      ? normalizeMenus(service, data?.menuList)
+      : normalizeOptions(service, data?.optionList);
+  }, [shopQuery.data, service, tab]);
 
-  const { data: groupsData, refetch: refetchGroups } = useQuery({
-    queryKey: ['menuGroups'],
-    queryFn: fetchMenuGroups,
-    staleTime: Infinity,
-  });
+  const visibleItems = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return q ? items.filter((i) => i.name.toLowerCase().includes(q)) : items;
+  }, [items, search]);
 
-  // 백엔드에서 가져온 데이터
-  const groupsDataParsed = useMemo(() => {
-    if (groupsData?.data?.menuGroups) {
-      return groupsData.data.menuGroups;
-    }
-    return {};
-  }, [groupsData]);
+  const groupNames = useMemo(() => {
+    const names = new Set<string>();
+    for (const key of ALL_SERVICES) Object.keys(groups[key] ?? {}).forEach((n) => names.add(n));
+    return [...names];
+  }, [groups]);
 
-  // 로컬 스토리지에서 데이터 로드 (기존 데이터를 새 형식으로 변환)
-  useEffect(() => {
-    const savedData = groupsDataParsed ||localStorage.getItem('menuGroups');
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData);
-        // groupNames 추출
-        const allGroupNames = new Set<string>();
-        const newGroupDataByService: GroupDataByService = {
-          baemin: {},
-          coupang: {},
-          ddangyo: {},
-          yogiyo: {},
-        };
+  const current = selectedGroup ? groups[service]?.[selectedGroup] : undefined;
+  const currentIds = new Set(current?.[tab] ?? []);
 
-        ALL_SERVICES.forEach(service => {
-          const serviceData = parsed[service] || {};
-          Object.keys(serviceData).forEach(groupName => {
-            allGroupNames.add(groupName);
-            const oldData = serviceData[groupName];
-            // 기존 데이터 형식인지 새 데이터 형식인지 확인
-            if (Array.isArray(oldData)) {
-              // 기존: { "그룹명": [아이템ID, ...] } -> 새: { "그룹명": { menu: [...], option: [] } }
-              newGroupDataByService[service][groupName] = { menu: oldData, option: [] };
-            } else if (oldData && typeof oldData === 'object') {
-              // 새 형식: { menu: [...], option: [...] }
-              newGroupDataByService[service][groupName] = oldData;
-            } else {
-              // 빈 데이터
-              newGroupDataByService[service][groupName] = { menu: [], option: [] };
-            }
-          });
-        });
+  const update = (next: MenuGroups) => setDraft(next);
 
-        setGroupNames(Array.from(allGroupNames));
-        setGroupDataByService(newGroupDataByService);
-      } catch (e) {
-        console.error('Failed to parse menuGroups from localStorage:', e);
-      }
-    }
-  }, [groupsDataParsed]);
+  const addGroup = () => {
+    const name = window.prompt('새 그룹 이름')?.trim();
+    if (!name) return;
+    if (groupNames.includes(name)) return window.alert('이미 있는 그룹입니다');
 
-  const serviceData = (data?.data as any)?.[selectedService];
-  const normalized = serviceData ? normalizeMenuData(selectedService, serviceData) : { menuList: [], optionList: [] };
-  const menuList = normalized.menuList;
-  const optionList = normalized.optionList;
-
-  // 현재 서비스의 그룹 데이터 (편집 상태 + 백엔드 데이터 병합)
-  const currentServiceData = groupDataByService[selectedService] || {};
-
-  const saveMutation = useMutation({
-    mutationFn: saveMenuGroups,
-    onSuccess: () => {
-      alert('저장되었습니다.');
-      refetchGroups();
-    },
-    onError: () => {
-      alert('서버 저장 실패 - 로컬에 저장됩니다.');
-    },
-  });
-
-  // 현재 서비스의 그룹 데이터만 저장
-  const handleSaveGroups = (updatedGroupData: Record<string, GroupItemData>) => {
-    // 현재 서비스의 데이터만 업데이트
-    const newGroupDataByService: GroupDataByService = {
-      ...groupDataByService,
-      [selectedService]: updatedGroupData,
-    };
-
-    // localStorage에 전체 저장
-    localStorage.setItem('menuGroups', JSON.stringify(newGroupDataByService));
-    
-    // 백엔드에 저장 (전체 데이터)
-    saveMutation.mutate(JSON.stringify(newGroupDataByService));
+    update({ ...groups, [service]: { ...groups[service], [name]: { menu: [], option: [] } } });
+    setSelectedGroup(name);
   };
 
-  // 그룹 추가 콜백
-  const handleGroupAdded = (name: string) => {
-    if (!groupNames.includes(name)) {
-      setGroupNames(prev => [...prev, name]);
-      // 새 그룹의 초기 데이터는 menu, option 빈 배열
-      setGroupDataByService(prev => ({
-        ...prev,
-        [selectedService]: {
-          ...prev[selectedService],
-          [name]: { menu: [], option: [] },
-        },
-      }));
+  const removeGroup = (name: string) => {
+    if (!window.confirm(`'${name}' 그룹을 모든 플랫폼에서 삭제합니다. 계속할까요?`)) return;
+
+    const next: MenuGroups = {};
+    for (const key of ALL_SERVICES) {
+      if (!groups[key]) continue;
+      const { [name]: _removed, ...rest } = groups[key];
+      next[key] = rest;
     }
+    update(next);
+    if (selectedGroup === name) setSelectedGroup(null);
   };
 
-  // 현재 서비스의 데이터만 삭제 (그룹 라디오 버튼의 X 버튼)
-  const handleGroupRemoved = (name: string) => {
-    setGroupDataByService(prev => ({
-      ...prev,
-      [selectedService]: {
-        ...prev[selectedService],
-        [name]: { menu: [], option: [] },
+  const toggleItem = (id: string) => {
+    if (!selectedGroup) return;
+    const existing = groups[service]?.[selectedGroup] ?? { menu: [], option: [] };
+    const list = existing[tab];
+    const nextList = list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+
+    update({
+      ...groups,
+      [service]: {
+        ...groups[service],
+        [selectedGroup]: { ...existing, [tab]: nextList },
       },
-    }));
-  };
-
-  // 그룹 자체를 삭제 (모든 서비스에서) - "이 서비스에서 삭제" 버튼용
-  const handleServiceDataRemoved = (name: string) => {
-    // 모든 서비스에서 해당 그룹 데이터 제거
-    setGroupDataByService(prev => {
-      const newData = { ...prev };
-      ALL_SERVICES.forEach(service => {
-        if (newData[service][name]) {
-          delete newData[service][name];
-        }
-      });
-      return newData;
     });
-    
-    // groupNames에서도 제거
-    const remainingNames = groupNames.filter(n => n !== name);
-    setGroupNames(remainingNames);
   };
 
-  // 아이템 토글 콜백 (메뉴/옵션 구분)
-  const handleItemToggled = (groupName: string, itemId: string, itemType: 'menu' | 'option') => {
-    const currentGroupData = currentServiceData[groupName] || { menu: [], option: [] };
-    const currentItems = currentGroupData[itemType] || [];
-    const exists = currentItems.includes(itemId);
-    const newItems = exists
-      ? currentItems.filter((id: string) => id !== itemId)
-      : [...currentItems, itemId];
-
-    setGroupDataByService(prev => ({
-      ...prev,
-      [selectedService]: {
-        ...prev[selectedService],
-        [groupName]: {
-          ...currentGroupData,
-          [itemType]: newItems,
-        },
-      },
-    }));
-  };
+  const shopResult = shopQuery.data?.results?.[service];
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      {/* 헤더 */}
-      <header className="sticky top-0 z-10 bg-white border-b border-zinc-200 px-4 py-3 flex items-center gap-3">
-        <button
-          onClick={() => navigate('/')}
-          className="p-2 rounded-lg hover:bg-zinc-100 transition-colors"
-          aria-label="뒤로가기"
-        >
-          <svg className="w-5 h-5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h1 className="text-base font-bold text-zinc-900">설정</h1>
-      </header>
+    <div className="min-h-screen bg-zinc-50 pb-10">
+      <Header title="메뉴 그룹 설정" />
 
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
-        {/* 서비스 선택 - 라디오 단건 */}
-        <section className="bg-white rounded-2xl p-4 shadow-sm border border-zinc-100">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">서비스 선택</p>
-          <div className="flex gap-2 flex-wrap">
-            {ALL_SERVICES.map((service) => (
-              <button
-                key={service}
-                onClick={() => setSelectedService(service)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all border ${
-                  selectedService === service
-                    ? 'bg-zinc-800 text-white border-zinc-800'
-                    : 'bg-white text-zinc-500 border-zinc-300 hover:border-zinc-500'
+      <main className="mx-auto max-w-3xl space-y-4 p-4">
+        {/* 플랫폼 */}
+        <div className="flex flex-wrap gap-2" role="group" aria-label="플랫폼 선택">
+          {ALL_SERVICES.map((key) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={service === key}
+              onClick={() => {
+                setService(key);
+                setSearch('');
+              }}
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                service === key ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600'
+              }`}
+            >
+              {SERVICE_LABELS[key]}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            type="button"
+            disabled={refresh.isPending || shopQuery.isFetching}
+            onClick={() => refresh.mutate(service)}
+            className="flex-1 rounded-xl border-2 border-zinc-200 bg-white px-4 py-3 font-semibold text-zinc-700 disabled:opacity-50"
+          >
+            {refresh.isPending || shopQuery.isFetching ? '불러오는 중…' : '메뉴 다시 불러오기'}
+          </button>
+          <button
+            type="button"
+            disabled={save.isPending || !draft}
+            onClick={() => save.mutate(groups, { onSuccess: () => setDraft(null) })}
+            className="flex-1 rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white disabled:opacity-50"
+          >
+            {save.isPending ? '저장 중…' : draft ? '변경사항 저장' : '저장됨'}
+          </button>
+        </div>
+
+        {save.isError && (
+          <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">
+            저장 실패: {(save.error as Error).message}
+          </p>
+        )}
+
+        {shopQuery.isError && (
+          <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">
+            메뉴를 불러오지 못했습니다: {(shopQuery.error as Error).message}
+          </p>
+        )}
+        {shopResult && !shopResult.ok && (
+          <p role="alert" className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-800">
+            {SERVICE_LABELS[service]}: {shopResult.error ?? '메뉴를 불러오지 못했습니다'}
+          </p>
+        )}
+
+        {/* 그룹 */}
+        <section className="rounded-2xl border border-zinc-200 bg-white p-4">
+          <h2 className="mb-3 font-bold text-zinc-900">그룹</h2>
+          <div className="flex flex-wrap gap-2">
+            {groupNames.map((name) => (
+              <span
+                key={name}
+                className={`inline-flex items-center gap-1 rounded-full py-1.5 pl-4 pr-1.5 text-sm font-semibold ${
+                  selectedGroup === name ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600'
                 }`}
               >
-                {SERVICE_LABELS[service]}
-              </button>
+                <button type="button" onClick={() => setSelectedGroup(name)}>
+                  {name}
+                </button>
+                <button
+                  type="button"
+                  aria-label={`${name} 그룹 삭제`}
+                  onClick={() => removeGroup(name)}
+                  className="rounded-full px-1.5 opacity-60 hover:opacity-100"
+                >
+                  ✕
+                </button>
+              </span>
             ))}
-          </div>
-        </section>
-
-        {/* 그룹 관리 */}
-        <section className="bg-white rounded-2xl p-4 shadow-sm border border-zinc-100">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">그룹 관리</p>
             <button
-              onClick={() => initAndRefresh.mutate()}
-              disabled={initAndRefresh.isPending || isLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-900 text-white transition-colors disabled:opacity-50"
+              type="button"
+              onClick={addGroup}
+              className="rounded-full border-2 border-dashed border-zinc-300 px-4 py-1.5 text-sm font-semibold text-zinc-500"
             >
-              <svg
-                className={`w-3.5 h-3.5 ${initAndRefresh.isPending ? 'animate-spin' : ''}`}
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              불러오기
+              + 새 그룹
             </button>
           </div>
-
-          {isLoading ? (
-            <div className="py-12 text-center">
-              <div className="inline-block w-6 h-6 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin" />
-              <p className="text-sm text-zinc-400 mt-2">메뉴 불러오는 중...</p>
-            </div>
-          ) : (
-            <GroupManager
-              selectedService={selectedService}
-              menuList={menuList}
-              optionList={optionList}
-              groupNames={groupNames}
-              groupData={currentServiceData}
-              onGroupAdded={handleGroupAdded}
-              onGroupRemoved={handleGroupRemoved}
-              onServiceDataRemoved={handleServiceDataRemoved}
-              onItemToggled={handleItemToggled}
-              onSave={handleSaveGroups}
-            />
-          )}
         </section>
-      </div>
+
+        {/* 항목 선택 */}
+        <section className="rounded-2xl border border-zinc-200 bg-white p-4">
+            <>
+              <div className="mb-3 flex gap-2" role="group" aria-label="항목 종류">
+                {(['menu', 'option'] as Tab[]).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={tab === t}
+                    onClick={() => setTab(t)}
+                    className={`flex-1 rounded-xl py-2.5 text-sm font-semibold ${
+                      tab === t ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600'
+                    }`}
+                  >
+                    {t === 'menu' ? '메뉴' : '옵션'}
+                    {selectedGroup && (
+                      <span className="ml-1 opacity-70">
+                        {(groups[service]?.[selectedGroup]?.[t] ?? []).length}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <label className="block">
+                <span className="sr-only">항목 검색</span>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="이름으로 검색"
+                  className="mb-3 h-12 w-full rounded-xl border-2 border-zinc-200 px-4"
+                />
+              </label>
+
+              {shopQuery.isPending ? (
+                <p className="py-8 text-center text-zinc-500">불러오는 중…</p>
+              ) : visibleItems.length === 0 ? (
+                <p className="py-8 text-center text-zinc-400">
+                  {items.length === 0 ? '항목이 없습니다' : '검색 결과가 없습니다'}
+                </p>
+              ) : (
+                <ul className="max-h-96 space-y-1 overflow-y-auto">
+                  {visibleItems.map((item) => {
+                    const on = currentIds.has(item.id);
+                    return (
+                      <li key={item.id}>
+                        <button
+                          type="button"
+                          aria-pressed={on}
+                          disabled={!selectedGroup}
+                          onClick={() => toggleItem(item.id)}
+                          className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left ${
+                            on ? 'bg-zinc-900 text-white' : 'hover:bg-zinc-50'
+                          }`}
+                        >
+                          <span aria-hidden="true" className="w-4 font-bold">
+                            {on ? '✓' : ''}
+                          </span>
+                          <span className="truncate">{item.name}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </>
+        </section>
+      </main>
     </div>
   );
 }
