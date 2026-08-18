@@ -26,7 +26,7 @@ export default function DateTimePicker({ value, onChange, disabled }: Props) {
   // 열 때마다 현재 값에서 초안을 다시 만든다
   useEffect(() => {
     if (open) {
-      setDraft(value);
+      setDraft(combine(value, value.hour(), Math.floor(value.minute()/10)*10));
       setMonth(value.startOf('month'));
     }
   }, [open, value]);
